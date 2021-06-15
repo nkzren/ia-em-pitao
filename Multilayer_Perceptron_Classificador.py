@@ -16,25 +16,29 @@ class MultiPerceptron:
         self.epocas = epocas
                
         self.pesoEntradaMeio = None
-
         self.pesoMeioSaida = None
+        self.min = 0
+        self.max = 0
         
         self.taxa = taxa or 0.1
 
-        if(funcao == 'relu'):
-            self.funcao = func.FuncoesAtivacao.relu
-            self.derivativa = func.FuncoesAtivacao.drelu        
-        elif(funcao == 'sigmoid'):
+
+        if(funcao == 'sigmoid'):
             self.funcao = func.FuncoesAtivacao.sigmoid
             self.derivativa = func.FuncoesAtivacao.dsigmoid
-        elif(funcao == 'tanh'):
-            self.funcao = func.FuncoesAtivacao.tanh
-            self.derivativa = func.FuncoesAtivacao.dtanh 
-        elif(funcao == 'softmax'): #por um caralho não use o softmax, ô derivada desgraçada
-            self.funcao = func.FuncoesAtivacao.softmax
-            self.derivativa = func.FuncoesAtivacao.dsoftmax               
+            self.min = func.FuncoesAtivacao.minsigmoid
+            self.max = func.FuncoesAtivacao.maxsigmoid
+        #efif(funcao == 'relu'):
+            #self.funcao = func.FuncoesAtivacao.relu
+            #self.derivativa = func.FuncoesAtivacao.drelu        
+        #elif(funcao == 'tanh'):
+            #self.funcao = func.FuncoesAtivacao.tanh
+            #self.derivativa = func.FuncoesAtivacao.dtanh 
+        #elif(funcao == 'softmax'): #não use o softmax, ô derivada desgraçada
+            #self.funcao = func.FuncoesAtivacao.softmax
+            #self.derivativa = func.FuncoesAtivacao.dsoftmax
         else:
-            raise Exception('Non-supported activation function')
+            raise Exception('Função de ativação não suportada')
         
         
     #@vectorize(["float32(float32, float32)"], target='cuda')  se o numba funcionasse, claro.
@@ -58,15 +62,15 @@ class MultiPerceptron:
         lin_2, col_2 = outputM.shape  #lin_2 = número de respostas, col_2 = número de *labels*    
 
         #inicializar as matrizes de peso
-        self.pesoEntradaMeio = np.random.rand(n,self.hiddenNodes)
+        self.pesoEntradaMeio = np.random.uniform(self.min, self.max,(n,self.hiddenNodes))
         
-        self.pesoMeioSaida = np.random.rand(self.hiddenNodes,col_2)
+        self.pesoMeioSaida = np.random.uniform(self.min, self.max,(self.hiddenNodes,col_2))
 
         #self.vies_1 = np.random.rand(n)
         #self.vies_2 = np.random.rand(self.hiddenNodes)
 
         custo_anterior = 100 # necessário para a verificação de convergência abaixo
-                             # precisa dar muito errado para que isso - custo depois de 20k épocas dê entre 0 e 0.001
+                             # precisa dar muito errado para que (isso) menos (custo depois de 20k épocas) dê entre 0 e 0.001
                 
         contador_de_epocas = 0
         # isso faz entrada x pesos da camada escondida, depois 
@@ -105,10 +109,9 @@ class MultiPerceptron:
             #ajustando os pesos da camada hidden -> saida
             self.pesoMeioSaida += outputHidden.T.dot(gradienteOutput) * self.taxa
 
-
-            #através da função de custo, eu vejo a convergência. estou parando as épocas quando ele chega em uma certa vizinhança
+            #o meu método de parada antecipada, checa o quanto a função de custo convergiu a cada 20 mil iterações.
             contador_de_epocas += 1            
-            if(contador_de_epocas%20000 ==0):
+            if(contador_de_epocas % 20000 ==0):
                 if(custo_anterior - custo < 0.001 and custo_anterior - custo > 0):
                     print("O custo convergiu abaixo de .001, saíndo.")
                     break 
@@ -120,7 +123,6 @@ class MultiPerceptron:
     def query(self, X):
 
         # é basicamente o forwardstep. os dados passam 1 vez e retornam a imagem.
-
         
         tabela = X
 

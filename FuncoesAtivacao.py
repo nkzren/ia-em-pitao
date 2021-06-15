@@ -1,6 +1,9 @@
 import numpy as np
 
 class FuncoesAtivacao:
+
+    maxsigmoid = 1
+    minsigmoid = -1
     
     def relu(x):
         return np.maximum(x,0)
