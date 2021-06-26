@@ -1,8 +1,8 @@
 import pandas as pd # usado para consertar os dados (porque tava triste)
 import numpy as np # usado porque arrays.
 from sklearn.metrics import r2_score #usado para marcar a acurácia
-import matplotlib.pyplot as plt #porque a sarajane pediu
-import seaborn as sn #porque a sarajane pediu parte 2
+import matplotlib.pyplot as plt # plot de matriz de confusão parte 1
+import seaborn as sn # plot de matriz de confusão parte 2
 import Multilayer_Perceptron_Classificador as mlpc #óbvio
 
 
@@ -44,7 +44,7 @@ respostas_testes = caracteres_teste.filter(colunas_rotulos, axis = 1)   # respos
 
 #----------------------------------------------------------------------------------  TREINE O BAGULHO
 
-mlp = mlpc.MultiPerceptron(17, 0.1, 100000, 'sigmoid') # nós_escondidos, taxa de aprendizado, épocas_maximas, função de ativação. nessa ordem
+mlp = mlpc.MultiPerceptron(17, 0.1, 100000, 'sigmoid', False) # nós_escondidos, taxa de aprendizado, épocas_maximas, função de ativação. nessa ordem
 
 mlp.train(X, y) #para este método, passe apenas X = tabela de features e y = tabela de targets, nessa ordem.
 
@@ -52,11 +52,11 @@ y_pred = mlp.query(testes)
 
 number = r2_score(y_pred, respostas_testes)
 
-#---------------------------------------------------------------------------------- PRINT DA RESPOSTA
+#---------------------------------------------------------------------------------- PRINT DA RESPOSTA (debug)
 
-#y_pred = y_pred.round(decimals=3) # isso deixa a matriz resultante mais legivel
-#y_pred_df = pd.DataFrame(y_pred)
-#print(y_pred_df)
+y_pred = y_pred.round(decimals=2) # isso deixa a matriz resultante mais legivel
+y_pred_df = pd.DataFrame(y_pred)
+print(y_pred_df)
 #print(respostas_testes)
 #---------------------------------------------------------------------------------- PRINT DA MATRIZ DE CONFUSÃO
 cm = matrizDeConfusao(respostas_testes.to_numpy(), y_pred)

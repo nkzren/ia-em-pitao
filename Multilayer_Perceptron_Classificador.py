@@ -11,7 +11,7 @@ class MultiPerceptron:
     # Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
     # .\.venv\Scripts\activate
 
-    def __init__(self, hiddenNodes, taxa, epocas, funcao):
+    def __init__(self, hiddenNodes, taxa, epocas, funcao, parada):
         self.hiddenNodes = hiddenNodes        
         self.epocas = epocas
                
@@ -19,6 +19,7 @@ class MultiPerceptron:
         self.pesoMeioSaida = None
         self.min = 0
         self.max = 0
+        self.parada = parada or False
         
         self.taxa = taxa or 0.1
 
@@ -111,9 +112,9 @@ class MultiPerceptron:
 
             #o meu método de parada antecipada, checa o quanto a função de custo convergiu a cada 20 mil iterações.
             contador_de_epocas += 1            
-            if(contador_de_epocas % 20000 ==0):
-                if(custo_anterior - custo < 0.001 and custo_anterior - custo > 0):
-                    print("O custo convergiu abaixo de .001, saíndo.")
+            if(contador_de_epocas % 20000 == 0 and self.parada == True):
+                if(custo_anterior - custo < 0.1 and custo_anterior - custo > 0):
+                    print("O custo convergiu abaixo de .1, saíndo.")
                     break 
                 custo_anterior = custo
                 print('Além de %d epocas.' % contador_de_epocas)
