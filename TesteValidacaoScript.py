@@ -52,7 +52,7 @@ respostas_testes = caracteres_teste.filter(colunas_rotulos, axis = 1)   # respos
 # Como será feito: cinco MLPs serão iniciados, dentre os cinco, aquele que se sair melhor com o
 # set de validação será eleito, e ele será utilizado no set de teste.
 
-parametros_base = mlpc.MultiPerceptron(17, 0.1, 850, 'sigmoid', False)
+parametros_base = mlpc.MultiPerceptron(20, 0.1, 5000, 'sigmoid', True)
 
 mlp1 = copy.copy(parametros_base)
 mlp2 = copy.copy(parametros_base)
@@ -86,8 +86,17 @@ else :
     print("o indice eleito foi: %d." % indice_eleito)
     eleito = modelos[indice_eleito]
 
-#---------------------------------------------------------------------------------- TESTE DE VERDADE
 
+
+#---------------------------------------------------------------------------------- TESTE DE VERDADE
 y_pred = eleito.query(testes)
 number = r2_score(y_pred, respostas_testes)
 print("Acurácia da IA: %.16f " % number)
+
+#---------------------------------------------------------------------------------- PRINT DA MATRIZ DE CONFUSÃO
+cm = matrizDeConfusao(respostas_testes.to_numpy(), y_pred)
+sn.heatmap(cm, annot=True, xticklabels=('A','B','C','D','E','F','K'), yticklabels=('A','B','C','D','E','F','K'))
+plt.xlabel("y_true") 
+plt.ylabel("y_pred") 
+plt.show()
+#---------------------------------------------------------------------------------- 
