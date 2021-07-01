@@ -112,16 +112,14 @@ class MultiPerceptron:
 
             #o meu método de parada antecipada, checa o quanto a função de custo convergiu a cada 1 mil iterações.
             contador_de_epocas += 1            
-            if(contador_de_epocas % 1000 == 0):
+            if(contador_de_epocas % 1000 == 0 and self.parada == True ):
+                if(custo_anterior - custo < 0.1 and custo_anterior - custo > 0):
+                    print("O custo convergiu abaixo de .1, saíndo.")
+                    break 
                 print('Além de %d epocas.' % contador_de_epocas)
-                print('Custo = %.16f' % custo)
-
-                if(self.parada == True):
-                    if(custo_anterior - custo < 0.1 and custo_anterior - custo > 0):
-                        print("O custo convergiu abaixo de .1, saíndo.")
-                        break 
-                    custo_anterior = custo
-        
+                print('Custo = %.16f' % custo)                
+                custo_anterior = custo
+                        
     def query(self, X):
 
         # é basicamente o forwardstep. os dados passam 1 vez e retornam a imagem.
