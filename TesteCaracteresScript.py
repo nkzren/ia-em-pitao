@@ -44,7 +44,7 @@ respostas_testes = caracteres_teste.filter(colunas_rotulos, axis = 1)   # respos
 
 #----------------------------------------------------------------------------------  TREINE O BAGULHO
 
-mlp = mlpc.MultiPerceptron(17, 0.1, 100000, 'sigmoid', False) # nós_escondidos, taxa de aprendizado, épocas_maximas, função de ativação. nessa ordem
+mlp = mlpc.MultiPerceptron(17, 0.1, 10000, 'sigmoid', False) # nós_escondidos, taxa de aprendizado, épocas_maximas, função de ativação. nessa ordem
 
 mlp.train(X, y) #para este método, passe apenas X = tabela de features e y = tabela de targets, nessa ordem.
 
@@ -57,7 +57,7 @@ number = r2_score(y_pred, respostas_testes)
 y_pred = y_pred.round(decimals=2) # isso deixa a matriz resultante mais legivel
 y_pred_df = pd.DataFrame(y_pred)
 print(y_pred_df)
-#print(respostas_testes)
+print(respostas_testes)
 #---------------------------------------------------------------------------------- PRINT DA MATRIZ DE CONFUSÃO
 cm = matrizDeConfusao(respostas_testes.to_numpy(), y_pred)
 sn.heatmap(cm, annot=True, xticklabels=('A','B','C','D','E','F','K'), yticklabels=('A','B','C','D','E','F','K'))

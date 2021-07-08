@@ -11,8 +11,9 @@ class MultiPerceptron:
     # Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
     # .\.venv\Scripts\activate
 
-    def __init__(self, hiddenNodes, taxa, epocas, funcao, parada):
-        self.hiddenNodes = hiddenNodes        
+    def __init__(self, hiddenNodes, taxa, epocas, funcao, parada, outputNodes=7):
+        self.hiddenNodes = hiddenNodes   
+        self.outputNodes = outputNodes     
         self.epocas = epocas
                
         self.pesoEntradaMeio = None
@@ -64,8 +65,10 @@ class MultiPerceptron:
 
         #inicializar as matrizes de peso
         self.pesoEntradaMeio = np.random.uniform(self.min, self.max,(n,self.hiddenNodes))
-        
         self.pesoMeioSaida = np.random.uniform(self.min, self.max,(self.hiddenNodes,col_2))
+
+        self.vies_1 = np.random.uniform(self.min, self.max, (1, self.hiddenNodes))
+        self.vies_2 = np.random.uniform(self.min, self.max, (1, self.outputNodes))
 
         #self.vies_1 = np.random.rand(n)
         #self.vies_2 = np.random.rand(self.hiddenNodes)
@@ -79,11 +82,11 @@ class MultiPerceptron:
         # estou muito feliz que isso dá certo eu demorei 2 dias pra entender
         while(contador_de_epocas <= self.epocas):
             #forward step:
-            inputHidden = np.dot(inputM, self.pesoEntradaMeio)
+            inputHidden = np.dot(inputM, self.pesoEntradaMeio) + self.vies_1
             
             outputHidden = self.funcao(inputHidden)
 
-            inputSaida = np.dot(outputHidden, self.pesoMeioSaida)            
+            inputSaida = np.dot(outputHidden, self.pesoMeioSaida) + self.vies_2         
            
             outputSaida = self.funcao(inputSaida)
 
@@ -109,6 +112,11 @@ class MultiPerceptron:
 
             #ajustando os pesos da camada hidden -> saida
             self.pesoMeioSaida += outputHidden.T.dot(gradienteOutput) * self.taxa
+
+            # ajustando os pesos do vies
+            self.vies_2 = np.sum(self.taxa * gradienteOutput)
+            self.vies_1 = np.sum((self.taxa * gradienteHidden))
+            
 
             #o meu método de parada antecipada, checa o quanto a função de custo convergiu a cada 1 mil iterações.
             contador_de_epocas += 1            
